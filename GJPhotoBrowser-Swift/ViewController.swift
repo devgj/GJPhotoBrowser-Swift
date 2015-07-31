@@ -2,13 +2,14 @@
 //  ViewController.swift
 //  GJPhotoBrowser-Swift
 //
-//  Created by imooc_gj on 15/7/30.
+//  Created by GJ on 15/7/30.
 //  Copyright (c) 2015年 devgj. All rights reserved.
-// 1.init 2.add imageViews 3.add
+//
 
 import UIKit
+import Kingfisher
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
     //MARK: - Property
     /// image urls
@@ -48,18 +49,65 @@ class ViewController: UIViewController {
         for i in 0...8 {
             let imageView = UIImageView()
             
+            // frame
             let row = CGFloat(i / 3)
             let col = CGFloat(i % 3)
-            println("\(row) - \(col)")
-            
             let x = startX + col * (width + margin)
             let y = startY + row * (height + margin)
-            
             imageView.frame = CGRectMake(x, y, width, height)
+            
+            // property
             imageView.backgroundColor = UIColor.redColor()
+            imageView.contentMode = UIViewContentMode.ScaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.tag = i
+            imageView.userInteractionEnabled = true
+            if let url = NSURL(string: self.urls[i]) {
+                imageView.kf_setImageWithURL(url)
+            }
+            
             self.view.addSubview(imageView)
+            
+            // gesture
+            let tap = UITapGestureRecognizer(target: self, action: Selector("tapImage:"))
+            imageView.addGestureRecognizer(tap)
         }
     }
-
+    
+    // MARK: - GJPhotoBrowserDataSource
+    func numberOfPhotosInPhotoBrowser(photoBrowser: GJPhotoBrowser) -> Int {
+        return urls.count
+    }
+    
+    func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String {
+        return getBigImageUrlStrAtIndex(index)
+    }
+    
+    func getBigImageUrlStrAtIndex(index: Int) -> String {
+        var bigImage_urlStr: String!
+        let thumbnail_urlStr = urls[index] as NSString
+        if thumbnail_urlStr.containsString("thumbnail") {
+            bigImage_urlStr = thumbnail_urlStr.stringByReplacingOccurrencesOfString("thumbnail", withString: "bmiddle")
+        } else {
+            bigImage_urlStr = thumbnail_urlStr.stringByReplacingOccurrencesOfString("wap360", withString: "wap720")
+        }
+        return bigImage_urlStr
+    }
+    
+    /**
+    *  tap image
+    */
+    func tapImage(sender: UIGestureRecognizer) {
+        let photoBrowser = GJPhotoBrowser()
+        photoBrowser.dataSource = self
+        
+        var index = 0
+        if let view = sender.view {
+            index = view.tag
+        }
+        photoBrowser.showWith(currentIndex: index)
+    }
+    
+    
 }
 

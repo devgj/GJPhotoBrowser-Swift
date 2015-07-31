@@ -14,6 +14,8 @@
 		F204740C1B69F80C00C10445 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F204740B1B69F80C00C10445 /* Images.xcassets */; };
 		F204740F1B69F80C00C10445 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F204740D1B69F80C00C10445 /* LaunchScreen.xib */; };
 		F204741B1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F204741A1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift */; };
+		F21A34251B6B1F0E00226D97 /* GJPhotoBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */; };
+		F21A34271B6B49BD00226D97 /* GJPhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21A34261B6B49BD00226D97 /* GJPhotoView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +42,8 @@
 		F20474141B69F80C00C10445 /* GJPhotoBrowser-SwiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GJPhotoBrowser-SwiftTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F20474191B69F80C00C10445 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F204741A1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GJPhotoBrowser_SwiftTests.swift; sourceTree = "<group>"; };
+		F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GJPhotoBrowser.swift; sourceTree = "<group>"; };
+		F21A34261B6B49BD00226D97 /* GJPhotoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GJPhotoView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +105,7 @@
 		F20474011B69F80C00C10445 /* GJPhotoBrowser-Swift */ = {
 			isa = PBXGroup;
 			children = (
+				F21A34231B6B1EAE00226D97 /* GJPhotoBrowser */,
 				F20474041B69F80C00C10445 /* AppDelegate.swift */,
 				F20474061B69F80C00C10445 /* ViewController.swift */,
 				F20474081B69F80C00C10445 /* Main.storyboard */,
@@ -134,6 +139,15 @@
 				F20474191B69F80C00C10445 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F21A34231B6B1EAE00226D97 /* GJPhotoBrowser */ = {
+			isa = PBXGroup;
+			children = (
+				F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */,
+				F21A34261B6B49BD00226D97 /* GJPhotoView.swift */,
+			);
+			path = GJPhotoBrowser;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -288,6 +302,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F20474071B69F80C00C10445 /* ViewController.swift in Sources */,
+				F21A34251B6B1F0E00226D97 /* GJPhotoBrowser.swift in Sources */,
+				F21A34271B6B49BD00226D97 /* GJPhotoView.swift in Sources */,
 				F20474051B69F80C00C10445 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

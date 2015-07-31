@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  GJPhotoBrowser-Swift
 //
-//  Created by imooc_gj on 15/7/30.
+//  Created by GJ on 15/7/30.
 //  Copyright (c) 2015年 devgj. All rights reserved.
 //
 
