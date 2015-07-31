@@ -13,14 +13,16 @@ protocol GJPhotoBrowserDataSource : NSObjectProtocol {
     func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String
 }
 
-class GJPhotoBrowser: UIViewController, UIScrollViewDelegate{
+class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegate {
     // MARK: - Property
     var currentIndex = 0 /// current photo index
     weak var dataSource: GJPhotoBrowserDataSource?
+    
     private lazy var numberOfPhotos = 0
     private lazy var reusePhotoViewsPool = NSMutableSet()
     private lazy var visiblePhotoViewsPool = NSMutableSet()
     private var scrollView: UIScrollView!
+    private var indexRange = (-1, -1)
     
     private let margin: CGFloat = 10
     
@@ -70,11 +72,21 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate{
         
         scrollView.backgroundColor = UIColor.blackColor()
         scrollView.contentSize = CGSizeMake(CGFloat(numberOfPhotos) * CGRectGetWidth(frame), 0)
+        scrollView.delegate = self
+        scrollView.pagingEnabled = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.contentOffset = CGPointMake(CGFloat(self.currentIndex) * frame.size.width, 0);
     }
     
     // MARK: - UIScrollViewDelegate
     func scrollViewDidScroll(scrollView: UIScrollView) {
         showPhotoViews()
+    }
+    
+    // MARK: - CustomDelegate
+    // MARK: GJPhotoViewDelegate
+    func photoViewDidSingleTap(photoView: GJPhotoView) {
+        dismiss()
     }
     
     // MARK: - Private Method
@@ -84,24 +96,76 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate{
             return
         }
         
+        let range = getIndexRnage()
+        if indexRange.0 == range.0 && indexRange.1 == range.1 {
+            return
+        }
+        indexRange = range
         
-    
+        queueReusablePhotoView()
+        
+        for index in indexRange.0...indexRange.1 {
+            let showing = isShowingAtIndex(index)
+            if !showing {
+                showPhotoViewsAtIndex(index)
+            }
+        }
     }
     
     private func showPhotoViewsAtIndex(index: Int) {
         let photoView = dequeueReusablePhotoView()
         
-        let scrollViewWidth = CGRectGetWidth(scrollView.bounds)
+        var frame = scrollView.bounds
+        frame.origin.x = CGFloat(index) * CGRectGetWidth(frame) + margin
+        frame.size.width -= 2 * margin
+        photoView.frame = frame
         
-        let photoViewX = CGFloat(index) * scrollViewWidth + margin
-        let photoViewWidth = scrollViewWidth - 2 * margin
-        
-        photoView.frame = CGRectMake(0, photoViewX, photoViewWidth, CGRectGetHeight(scrollView.frame))
-        scrollView.addSubview(photoView)
-        
+        photoView.tag = index
         if let urlStr = dataSource?.photoBrowser(self, imageUrlAtIndex: index) {
             photoView.imageUrl = NSURL(string: urlStr)
         }
+        scrollView.addSubview(photoView)
+        visiblePhotoViewsPool.addObject(photoView)
+    }
+    
+    private func getIndexRnage() -> (Int, Int) {
+        let visibleBounds = scrollView.bounds
+        let width = CGRectGetWidth(visibleBounds)
+        let minX = CGRectGetMinX(visibleBounds) + margin
+        let maxX = CGRectGetMaxX(visibleBounds) - margin
+        var startIndex = Int(minX / width)
+        var endIndex = Int(maxX / width)
+        
+        if startIndex < 0 {
+            startIndex = 0
+        }
+        if endIndex > numberOfPhotos - 1 {
+            endIndex = numberOfPhotos - 1
+        }
+        
+        return (startIndex, endIndex)
+    }
+    
+    private func isShowingAtIndex(index: Int) -> Bool {
+        for obj in visiblePhotoViewsPool {
+            let photoView = obj as! GJPhotoView
+            if photoView.tag == index {
+                return true
+            }
+        }
+        return false
+    }
+    
+    private func queueReusablePhotoView() {
+        for obj in visiblePhotoViewsPool {
+            let photoView = obj as! GJPhotoView
+            if photoView.tag < indexRange.0 || photoView.tag > indexRange.1 {
+                photoView.removeFromSuperview()
+                reusePhotoViewsPool.addObject(photoView)
+            }
+        }
+        
+        visiblePhotoViewsPool.minusSet(reusePhotoViewsPool as Set<NSObject>)
     }
     
     private func dequeueReusablePhotoView() -> GJPhotoView {
@@ -111,6 +175,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate{
             reusePhotoViewsPool.removeObject(p)
         } else {
             photoView = GJPhotoView()
+            photoView.photoViewDelegate = self
         }
         return photoView
     }
