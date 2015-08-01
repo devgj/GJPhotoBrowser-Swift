@@ -20,23 +20,30 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
             downloadImage()
         }
     }
+    weak var photoViewDelegate: GJPhotoViewDelegate?
     
+    private var indicatorView: UIActivityIndicatorView
     private var imageView: UIImageView
     private var doubleTap = false
-    weak var photoViewDelegate: GJPhotoViewDelegate?
 
     // MARK: - Life Cycle
     override init(frame: CGRect) {
+        // imageView
         imageView = UIImageView()
         imageView.contentMode = UIViewContentMode.ScaleAspectFit
         
+        // indicatorView
+        indicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+        
         super.init(frame: frame)
         
-        self.addSubview(imageView)
         self.backgroundColor = UIColor.purpleColor()
         self.minimumZoomScale = 1.0
         self.maximumZoomScale = 2.0
         self.delegate = self
+        
+        self.addSubview(imageView)
+        self.addSubview(indicatorView)
         
         setupGesture()
     }
@@ -45,13 +52,26 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Layout
+    override func layoutSubviews() {
+        let photoViewSize = self.bounds.size;
+        indicatorView.center = CGPointMake(photoViewSize.width * 0.5 , photoViewSize.height * 0.5)
+    }
+    
     //MARK: - UIScrollViewDelegate
     func viewForZoomingInScrollView(scrollView: UIScrollView) -> UIView? {
         return imageView
     }
     
+    // keep center when zoom
     func scrollViewDidZoom(scrollView: UIScrollView) {
+        let contentSize = scrollView.contentSize
+        let scrollViewSize = scrollView.bounds.size
         
+        let centerX = scrollViewSize.width > contentSize.width ? scrollViewSize.width * 0.5 : contentSize.width * 0.5
+        let centerY = scrollViewSize.height > contentSize.height ? scrollViewSize.height * 0.5 : contentSize.height * 0.5
+        
+        imageView.center = CGPointMake(centerX, centerY)
     }
     
     //MARK: - Private Method
@@ -66,11 +86,13 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     
     private func downloadImage() {
         if let url = imageUrl {
+            indicatorView.startAnimating()
             imageView.kf_setImageWithURL(url, placeholderImage: nil, optionsInfo: nil, progressBlock: { (receivedSize: Int64, totalSize: Int64) -> () in
                 
             }, completionHandler: { [weak self] (image: UIImage?, error: NSError?, cacheType: CacheType, imageURL: NSURL?) -> () in
                 if let wself = self {
                     wself.downloadCompletionWithImage(image)
+                    wself.indicatorView.stopAnimating()
                 }
             })
         }
@@ -78,9 +100,9 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     
     private func downloadCompletionWithImage(image: UIImage?) {
         if let aImage = image {
-            println("下载成功")
+//            println("download success")
         } else {
-            println("下载失败")
+//            println("download failure")
         }
         
         setupImageViewFrame()
@@ -119,9 +141,7 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         let time: NSTimeInterval = 0.3
         let delay = dispatch_time(DISPATCH_TIME_NOW, Int64(time * Double(NSEC_PER_SEC)))
         dispatch_after(delay, dispatch_get_main_queue()) { () -> Void in
-            if self.doubleTap {
-               return
-            }
+            if self.doubleTap { return }
             
             if let delegate = self.photoViewDelegate {
                 if delegate.respondsToSelector(Selector("photoViewDidSingleTap:")) {
