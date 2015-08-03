@@ -10,7 +10,7 @@ import UIKit
 
 protocol GJPhotoBrowserDataSource : NSObjectProtocol {
     func numberOfPhotosInPhotoBrowser(photoBrowser: GJPhotoBrowser) -> Int
-    func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String
+    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (urlStr: String?, srcFrame: CGRect?, placeholderImage: UIImage?)
 }
 
 class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegate {
@@ -121,8 +121,10 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         photoView.frame = frame
         
         photoView.tag = index
-        if let urlStr = dataSource?.photoBrowser(self, imageUrlAtIndex: index) {
-            photoView.imageUrl = NSURL(string: urlStr)
+        if let (urlStr, srcFrame, placeholder) = dataSource?.photoBrowser(self, contentAtIndex: index) {
+            if urlStr != nil {
+                photoView.imageUrl = NSURL(string: urlStr!)
+            }
         }
         scrollView.addSubview(photoView)
         visiblePhotoViewsPool.addObject(photoView)

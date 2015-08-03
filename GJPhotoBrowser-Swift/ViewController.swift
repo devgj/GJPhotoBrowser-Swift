@@ -13,7 +13,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
     //MARK: - Property
     /// image urls
-    lazy var urls: [String] = {
+    private lazy var urls: [String] = {
         let tempUrls = ["http://ww4.sinaimg.cn/thumbnail/7f8c1087gw1e9g06pc68ug20ag05y4qq.gif", //gif
         "http://ww4.sinaimg.cn/wap360/67dd74e0gw1eue60fp791j20c60v7gnt.jpg",
         "http://ww4.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr1d0vyj20pf0gytcj.jpg",
@@ -26,6 +26,8 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         
         return tempUrls
     }()
+    
+    private lazy var imageViews = [UIImageView]()
     
     //MARK: - Life Cycle
     override func viewDidLoad() {
@@ -71,6 +73,8 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
             // gesture
             let tap = UITapGestureRecognizer(target: self, action: Selector("tapImage:"))
             imageView.addGestureRecognizer(tap)
+            
+            imageViews.append(imageView)
         }
     }
     
@@ -79,8 +83,20 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         return urls.count
     }
     
-    func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String {
-        return getBigImageUrlStrAtIndex(index)
+//    func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String {
+//        return getBigImageUrlStrAtIndex(index)
+//    }
+    
+//    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (UIImageView, String) {
+//        let srcImageView = imageViews[index]
+//        let urlStr = getBigImageUrlStrAtIndex(index)
+//        return (srcImageView, urlStr)
+//    }
+    
+    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (urlStr: String?, srcFrame: CGRect?, placeholderImage: UIImage?) {
+        let srcImageView = imageViews[index]
+        let urlStr = getBigImageUrlStrAtIndex(index)
+        return (urlStr, srcImageView.frame, srcImageView.image)
     }
     
     func getBigImageUrlStrAtIndex(index: Int) -> String {

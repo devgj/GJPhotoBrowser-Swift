@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "GJPhotoBrowser-Swift/GJPhotoBrowser/GJPhotoBrowser.swift"
-            timestampString = "460029984.832264"
+            timestampString = "460264341.236227"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "146"
-            endingLineNumber = "146"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
             landmarkName = "getIndexRnage()"
             landmarkType = "5">
          </BreakpointContent>
