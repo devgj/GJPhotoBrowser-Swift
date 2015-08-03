@@ -11,6 +11,7 @@ import Kingfisher
 
 class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
+    @IBOutlet weak var bgView: UIView!
     //MARK: - Property
     /// image urls
     private lazy var urls: [String] = {
@@ -42,10 +43,10 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
     func setupImageViews() {
         let width: CGFloat = 80
         let height: CGFloat = 80
-        let margin: CGFloat = (CGRectGetWidth(self.view.bounds) - 3 * width) / 4
+        let margin: CGFloat = (CGRectGetWidth(self.bgView.bounds) - 3 * width) / 4
         
-        let startX: CGFloat = 0.5 * (CGRectGetWidth(self.view.bounds) - 3 * width - 2 * margin)
-        let startY: CGFloat = 0.5 * (CGRectGetHeight(self.view.bounds) - 3 * height - 2 * margin)
+        let startX: CGFloat = 0.5 * (CGRectGetWidth(self.bgView.bounds) - 3 * width - 2 * margin)
+        let startY: CGFloat = 0.5 * (CGRectGetHeight(self.bgView.bounds) - 3 * height - 2 * margin)
         
         // create imageViews
         for i in 0...8 {
@@ -68,7 +69,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
                 imageView.kf_setImageWithURL(url)
             }
             
-            self.view.addSubview(imageView)
+            self.bgView.addSubview(imageView)
             
             // gesture
             let tap = UITapGestureRecognizer(target: self, action: Selector("tapImage:"))
@@ -83,20 +84,12 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         return urls.count
     }
     
-//    func photoBrowser(photoBrowser: GJPhotoBrowser, imageUrlAtIndex index: Int) -> String {
-//        return getBigImageUrlStrAtIndex(index)
-//    }
-    
-//    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (UIImageView, String) {
-//        let srcImageView = imageViews[index]
-//        let urlStr = getBigImageUrlStrAtIndex(index)
-//        return (srcImageView, urlStr)
-//    }
-    
-    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (urlStr: String?, srcFrame: CGRect?, placeholderImage: UIImage?) {
+    func photoBrowser(photoBrowser: GJPhotoBrowser, viewForIndex index: Int) -> GJPhotoView {
+        let photoView = photoBrowser.dequeueReusablePhotoView()
         let srcImageView = imageViews[index]
         let urlStr = getBigImageUrlStrAtIndex(index)
-        return (urlStr, srcImageView.frame, srcImageView.image)
+        photoView.setImageWithURL(NSURL(string: urlStr)!, fromImageView: imageViews[index])
+        return photoView
     }
     
     func getBigImageUrlStrAtIndex(index: Int) -> String {

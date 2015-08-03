@@ -10,7 +10,7 @@ import UIKit
 
 protocol GJPhotoBrowserDataSource : NSObjectProtocol {
     func numberOfPhotosInPhotoBrowser(photoBrowser: GJPhotoBrowser) -> Int
-    func photoBrowser(photoBrowser: GJPhotoBrowser, contentAtIndex index: Int) -> (urlStr: String?, srcFrame: CGRect?, placeholderImage: UIImage?)
+    func photoBrowser(photoBrowser: GJPhotoBrowser, viewForIndex index: Int) -> GJPhotoView
 }
 
 class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegate {
@@ -23,10 +23,25 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
     private lazy var visiblePhotoViewsPool = NSMutableSet()
     private var scrollView: UIScrollView!
     private var indexRange = (-1, -1)
+    private var animatedFlag = true
     
     private let margin: CGFloat = 10
     
+    
     // MARK: - Public Method
+    func dequeueReusablePhotoView() -> GJPhotoView {
+        var photoView: GJPhotoView!
+        if let p = reusePhotoViewsPool.anyObject() as? GJPhotoView {
+            photoView = p
+            reusePhotoViewsPool.removeObject(p)
+        } else {
+            photoView = GJPhotoView()
+            photoView.photoViewDelegate = self
+            photoView.photoBrowserView = self.view
+        }
+        return photoView
+    }
+    
     /**
     show with index 0
     */
@@ -70,7 +85,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         scrollView.frame = frame
         self.view.addSubview(scrollView)
         
-        scrollView.backgroundColor = UIColor.blackColor()
+        scrollView.backgroundColor = UIColor.clearColor()
         scrollView.contentSize = CGSizeMake(CGFloat(numberOfPhotos) * CGRectGetWidth(frame), 0)
         scrollView.delegate = self
         scrollView.pagingEnabled = true
@@ -113,19 +128,19 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
     }
     
     private func showPhotoViewsAtIndex(index: Int) {
-        let photoView = dequeueReusablePhotoView()
+        if dataSource == nil {return}
+        let photoView = dataSource!.photoBrowser(self, viewForIndex: index)
         
         var frame = scrollView.bounds
         frame.origin.x = CGFloat(index) * CGRectGetWidth(frame) + margin
         frame.size.width -= 2 * margin
         photoView.frame = frame
-        
         photoView.tag = index
-        if let (urlStr, srcFrame, placeholder) = dataSource?.photoBrowser(self, contentAtIndex: index) {
-            if urlStr != nil {
-                photoView.imageUrl = NSURL(string: urlStr!)
-            }
-        }
+        
+        let animated = animatedFlag && self.currentIndex == index
+        photoView.showImage(animated: animated)
+        if animatedFlag {animatedFlag = false}
+        
         scrollView.addSubview(photoView)
         visiblePhotoViewsPool.addObject(photoView)
     }
@@ -168,18 +183,6 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         }
         
         visiblePhotoViewsPool.minusSet(reusePhotoViewsPool as Set<NSObject>)
-    }
-    
-    private func dequeueReusablePhotoView() -> GJPhotoView {
-        var photoView: GJPhotoView!
-        if let p = reusePhotoViewsPool.anyObject() as? GJPhotoView {
-            photoView = p
-            reusePhotoViewsPool.removeObject(p)
-        } else {
-            photoView = GJPhotoView()
-            photoView.photoViewDelegate = self
-        }
-        return photoView
     }
     
     private func dismiss() {

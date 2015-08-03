@@ -9,35 +9,67 @@
 import UIKit
 import Kingfisher
 
+let animationDuration = 0.25
+
 @objc protocol GJPhotoViewDelegate: NSObjectProtocol {
     optional func photoViewDidSingleTap(photoView: GJPhotoView) -> ()
 }
 
 class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     // MARK: - Property
-    var imageUrl: NSURL? {
-        didSet {
-            downloadImage()
-        }
-    }
     weak var photoViewDelegate: GJPhotoViewDelegate?
+    var fromImageView: UIImageView?
+    var url: NSURL?
+    weak var photoBrowserView: UIView?
     
     private var indicatorView: UIActivityIndicatorView
     private var imageView: UIImageView
     private var doubleTap = false
+    
+    //MARK: - Public Method
+    func setImageWithURL(url: NSURL, fromImageView: UIImageView) {
+        self.fromImageView = fromImageView
+        self.url = url
+    }
+    
+    func showImage(#animated: Bool) {
+        if !animated {
+           beginDownload()
+        } else {
+            imageView.image = fromImageView?.image
+            imageView.frame = fromImageView!.convertRect(fromImageView!.bounds, toView: nil)
+            
+            let fittedSize = calculateFittedSize()
+            UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+                if fittedSize?.height <= CGRectGetHeight(self.bounds) {
+                    self.imageView.center = CGPointMake(self.bounds.size.width * 0.5, self.bounds.size.height * 0.5)
+                    self.imageView.bounds = CGRectMake(0, 0, fittedSize!.width, fittedSize!.height)
+                } else {
+                    self.imageView.frame = CGRectMake(0, 0, fittedSize!.width, fittedSize!.height)
+                }
+                self.backgroundColor = UIColor.blackColor()
+                
+                }, completion: { (finished: Bool) -> Void in
+                    
+                self.photoBrowserView?.backgroundColor = UIColor.blackColor()
+                self.beginDownload()
+            })
+        }
+    }
 
     // MARK: - Life Cycle
     override init(frame: CGRect) {
         // imageView
         imageView = UIImageView()
-        imageView.contentMode = UIViewContentMode.ScaleAspectFit
+        imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        imageView.clipsToBounds = true
         
         // indicatorView
         indicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
         
         super.init(frame: frame)
         
-        self.backgroundColor = UIColor.purpleColor()
+        self.backgroundColor = UIColor.clearColor()
         self.minimumZoomScale = 1.0
         self.maximumZoomScale = 2.0
         self.delegate = self
@@ -84,18 +116,16 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         self.addGestureRecognizer(singleTapGes)
     }
     
-    private func downloadImage() {
-        if let url = imageUrl {
-            indicatorView.startAnimating()
-            imageView.kf_setImageWithURL(url, placeholderImage: nil, optionsInfo: nil, progressBlock: { (receivedSize: Int64, totalSize: Int64) -> () in
-                
+    private func beginDownload() {
+        indicatorView.startAnimating()
+        imageView.kf_setImageWithURL(url!, placeholderImage: fromImageView?.image, optionsInfo: nil, progressBlock: { (receivedSize: Int64, totalSize: Int64) -> () in
+            
             }, completionHandler: { [weak self] (image: UIImage?, error: NSError?, cacheType: CacheType, imageURL: NSURL?) -> () in
                 if let wself = self {
                     wself.downloadCompletionWithImage(image)
                     wself.indicatorView.stopAnimating()
                 }
             })
-        }
     }
     
     private func downloadCompletionWithImage(image: UIImage?) {
@@ -143,11 +173,19 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         dispatch_after(delay, dispatch_get_main_queue()) { () -> Void in
             if self.doubleTap { return }
             
-            if let delegate = self.photoViewDelegate {
-                if delegate.respondsToSelector(Selector("photoViewDidSingleTap:")) {
-                    delegate.photoViewDidSingleTap!(self)
+            self.photoBrowserView?.backgroundColor = UIColor.clearColor()
+            UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+                self.imageView.frame = self.fromImageView!.convertRect(self.fromImageView!.bounds, toView: nil)
+                self.backgroundColor = UIColor.clearColor()
+                
+                }, completion: { (finished: Bool) -> Void in
+                    
+                if let delegate = self.photoViewDelegate {
+                    if delegate.respondsToSelector(Selector("photoViewDidSingleTap:")) {
+                        delegate.photoViewDidSingleTap!(self)
+                    }
                 }
-            }
+            })
         }
     }
     
