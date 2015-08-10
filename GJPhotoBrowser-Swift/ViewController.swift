@@ -11,35 +11,34 @@ import Kingfisher
 
 class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
-    @IBOutlet weak var bgView: UIView!
+    
     //MARK: - Property
-    /// image urls
+    
+    @IBOutlet weak var bgView: UIView!
     private lazy var urls: [String] = {
-        let tempUrls = ["http://ww4.sinaimg.cn/thumbnail/7f8c1087gw1e9g06pc68ug20ag05y4qq.gif", //gif
-        "http://ww4.sinaimg.cn/wap360/67dd74e0gw1eue60fp791j20c60v7gnt.jpg",
-        "http://ww4.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr1d0vyj20pf0gytcj.jpg",
-        "http://ww3.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr1xydcj20gy0o9q6s.jpg",
-        "http://ww2.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr2n1jjj20gy0o9tcc.jpg",
-        "http://ww2.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr39ht9j20gy0o6q74.jpg",
-        "http://ww3.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr3xvtlj20gy0obadv.jpg",
-        "http://ww4.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr4nndfj20gy0o9q6i.jpg",
-        "http://ww3.sinaimg.cn/thumbnail/8e88b0c1gw1e9lpr57tn9j20gy0obn0f.jpg"]
-        
-        return tempUrls
+        let urls = [
+            "http://ww3.sinaimg.cn/wap360/006bUn4ljw1euwusbp673j30k00qoq7d.jpg",
+            "http://ww1.sinaimg.cn/or360/a716fd45jw1eux8uc9k9gg208c08c1ky.jpg",
+            "http://ww3.sinaimg.cn/wap360/67dd74e0gw1euxt4ok84xj20c84eanh4.jpg",
+            "http://ww1.sinaimg.cn/wap360/006bUn4ljw1euwusav8n8j30dw099abb.jpg",
+            "http://ww3.sinaimg.cn/wap360/006bUn4ljw1euwus9mkmfj30fa0a6751.jpg",
+            "http://ww2.sinaimg.cn/wap360/006bUn4ljw1euwus8h8ubj30go0fdabh.jpg",
+            "http://ww2.sinaimg.cn/wap360/006bUn4ljw1euwus84thpj30dw0dw76q.jpg",
+            "http://ww3.sinaimg.cn/wap360/006bUn4ljw1euwus794ioj30dw0980to.jpg",
+            "http://ww1.sinaimg.cn/wap360/006bUn4ljw1euwus6ooq6j30dw099aax.jpg",]
+        return urls
     }()
     
     private lazy var imageViews = [UIImageView]()
     
-    //MARK: - Life Cycle
+    // MARK: - Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupImageViews()
     }
     
-    /**
-    add imageViews
-    */
     func setupImageViews() {
         let width: CGFloat = 80
         let height: CGFloat = 80
@@ -49,7 +48,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         let startY: CGFloat = 0.5 * (CGRectGetHeight(self.bgView.bounds) - 3 * height - 2 * margin)
         
         // create imageViews
-        for i in 0...8 {
+        for i in 0..<urls.count {
             let imageView = UIImageView()
             
             // frame
@@ -92,20 +91,19 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         return photoView
     }
     
+    // MARK: - Other
+    
     func getBigImageUrlStrAtIndex(index: Int) -> String {
         var bigImage_urlStr: String!
         let thumbnail_urlStr = urls[index] as NSString
-        if thumbnail_urlStr.containsString("thumbnail") {
-            bigImage_urlStr = thumbnail_urlStr.stringByReplacingOccurrencesOfString("thumbnail", withString: "bmiddle")
+        if thumbnail_urlStr.containsString("or360") {
+            bigImage_urlStr = thumbnail_urlStr.stringByReplacingOccurrencesOfString("or360", withString: "woriginal")
         } else {
             bigImage_urlStr = thumbnail_urlStr.stringByReplacingOccurrencesOfString("wap360", withString: "wap720")
         }
         return bigImage_urlStr
     }
     
-    /**
-    *  tap image
-    */
     func tapImage(sender: UIGestureRecognizer) {
         let photoBrowser = GJPhotoBrowser()
         photoBrowser.dataSource = self
@@ -116,7 +114,5 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
         }
         photoBrowser.showWith(currentIndex: index)
     }
-    
-    
 }
 
