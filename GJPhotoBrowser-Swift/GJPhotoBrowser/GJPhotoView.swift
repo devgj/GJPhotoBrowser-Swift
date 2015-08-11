@@ -8,21 +8,26 @@
 
 import UIKit
 import Kingfisher
-
-let animationDuration = 0.25
+import SDWebImage
 
 @objc protocol GJPhotoViewDelegate: NSObjectProtocol {
     optional func photoViewDidSingleTap(photoView: GJPhotoView) -> ()
 }
 
 class GJPhotoView: UIScrollView, UIScrollViewDelegate {
+    // MARK: - Types
+    struct photoViewConst {
+        static let animationDuration = 0.25
+        static let loadingViewWH = 50
+    }
+    
     // MARK: - Property
     weak var photoViewDelegate: GJPhotoViewDelegate?
     var fromImageView: UIImageView?
     var url: NSURL?
     weak var photoBrowserView: UIView?
     
-    private var indicatorView: UIActivityIndicatorView
+    private var loadingView: GJProgressView
     private var imageView: UIImageView
     private var doubleTap = false
     
@@ -33,6 +38,7 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     }
     
     func showImage(#animated: Bool) {
+        loadingView.hidden = true
         if !animated {
            beginDownload()
         } else {
@@ -40,7 +46,7 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
             imageView.frame = fromImageView!.convertRect(fromImageView!.bounds, toView: nil)
             
             let fittedSize = calculateFittedSize()
-            UIView.animateWithDuration(animationDuration, animations: { () -> Void in
+            UIView.animateWithDuration(photoViewConst.animationDuration, animations: { () -> Void in
                 if fittedSize?.height <= CGRectGetHeight(self.bounds) {
                     self.imageView.center = CGPointMake(self.bounds.size.width * 0.5, self.bounds.size.height * 0.5)
                     self.imageView.bounds = CGRectMake(0, 0, fittedSize!.width, fittedSize!.height)
@@ -64,8 +70,9 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         imageView.contentMode = UIViewContentMode.ScaleAspectFill
         imageView.clipsToBounds = true
         
-        // indicatorView
-        indicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+        // loadingView
+        loadingView = GJProgressView()
+        loadingView.hidden = true
         
         super.init(frame: frame)
         
@@ -75,7 +82,7 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         self.delegate = self
         
         self.addSubview(imageView)
-        self.addSubview(indicatorView)
+        self.addSubview(loadingView)
         
         setupGesture()
     }
@@ -87,7 +94,8 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     //MARK: - Layout
     override func layoutSubviews() {
         let photoViewSize = self.bounds.size;
-        indicatorView.center = CGPointMake(photoViewSize.width * 0.5 , photoViewSize.height * 0.5)
+        loadingView.center = CGPointMake(photoViewSize.width * 0.5 , photoViewSize.height * 0.5)
+        loadingView.bounds = CGRect(x: 0, y: 0, width: photoViewConst.loadingViewWH, height: photoViewConst.loadingViewWH)
     }
     
     //MARK: - UIScrollViewDelegate
@@ -117,15 +125,19 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     }
     
     private func beginDownload() {
-        indicatorView.startAnimating()
-        imageView.kf_setImageWithURL(url!, placeholderImage: fromImageView?.image, optionsInfo: nil, progressBlock: { (receivedSize: Int64, totalSize: Int64) -> () in
-            
-            }, completionHandler: { [weak self] (image: UIImage?, error: NSError?, cacheType: CacheType, imageURL: NSURL?) -> () in
-                if let wself = self {
-                    wself.downloadCompletionWithImage(image)
-                    wself.indicatorView.stopAnimating()
-                }
-            })
+        let exists = SDWebImageManager.sharedManager().cachedImageExistsForURL(url!)
+        if !exists {
+            loadingView.hidden = false
+            loadingView.progress = 0.1
+        }
+        
+        imageView.sd_setImageWithURL(url!, placeholderImage: fromImageView?.image, options: SDWebImageOptions.allZeros, progress: { [weak self] (receivedSize: Int, totalSize: Int) -> Void in
+                let progress = Double(receivedSize) / Double(totalSize)
+                self?.loadingView.progress = progress
+            }) { [weak self] (image: UIImage!, error: NSError!,  cacheType: SDImageCacheType, url: NSURL!) -> Void in
+                self?.downloadCompletionWithImage(image)
+                self?.loadingView.hidden = true
+        }
     }
     
     private func downloadCompletionWithImage(image: UIImage?) {
@@ -172,10 +184,10 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         let delay = dispatch_time(DISPATCH_TIME_NOW, Int64(time * Double(NSEC_PER_SEC)))
         dispatch_after(delay, dispatch_get_main_queue()) { () -> Void in
             if self.doubleTap { return }
-            
             self.photoBrowserView?.backgroundColor = UIColor.clearColor()
-            UIView.animateWithDuration(animationDuration, animations: { () -> Void in
-                self.imageView.frame = self.fromImageView!.convertRect(self.fromImageView!.bounds, toView: nil)
+            let frame = self.fromImageView!.convertRect(self.fromImageView!.bounds, toView: self)
+            UIView.animateWithDuration(photoViewConst.animationDuration, animations: { () -> Void in
+                self.imageView.frame = frame
                 self.backgroundColor = UIColor.clearColor()
                 
                 }, completion: { (finished: Bool) -> Void in

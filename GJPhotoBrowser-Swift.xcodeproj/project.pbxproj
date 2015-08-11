@@ -16,6 +16,7 @@
 		F204741B1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F204741A1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift */; };
 		F21A34251B6B1F0E00226D97 /* GJPhotoBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */; };
 		F21A34271B6B49BD00226D97 /* GJPhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21A34261B6B49BD00226D97 /* GJPhotoView.swift */; };
+		F2F357101B79C6B300DFF319 /* GJProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2F3570F1B79C6B300DFF319 /* GJProgressView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,7 @@
 		F204741A1B69F80C00C10445 /* GJPhotoBrowser_SwiftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GJPhotoBrowser_SwiftTests.swift; sourceTree = "<group>"; };
 		F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GJPhotoBrowser.swift; sourceTree = "<group>"; };
 		F21A34261B6B49BD00226D97 /* GJPhotoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GJPhotoView.swift; sourceTree = "<group>"; };
+		F2F3570F1B79C6B300DFF319 /* GJProgressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GJProgressView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,6 +148,7 @@
 			children = (
 				F21A34241B6B1F0E00226D97 /* GJPhotoBrowser.swift */,
 				F21A34261B6B49BD00226D97 /* GJPhotoView.swift */,
+				F2F3570F1B79C6B300DFF319 /* GJProgressView.swift */,
 			);
 			path = GJPhotoBrowser;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 			files = (
 				F20474071B69F80C00C10445 /* ViewController.swift in Sources */,
 				F21A34251B6B1F0E00226D97 /* GJPhotoBrowser.swift in Sources */,
+				F2F357101B79C6B300DFF319 /* GJProgressView.swift in Sources */,
 				F21A34271B6B49BD00226D97 /* GJPhotoView.swift in Sources */,
 				F20474051B69F80C00C10445 /* AppDelegate.swift in Sources */,
 			);
@@ -434,10 +438,13 @@
 			baseConfigurationReference = 53B403BA1158E7E9E584BF17 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = "GJPhotoBrowser-Swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "GJPhotoBrowser-Swift/GJPhotoBrowser-Swift-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
@@ -446,10 +453,12 @@
 			baseConfigurationReference = 5D99B49546D5BE0715B75DC5 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = "GJPhotoBrowser-Swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "GJPhotoBrowser-Swift/GJPhotoBrowser-Swift-Bridging-Header.h";
 			};
 			name = Release;
 		};
