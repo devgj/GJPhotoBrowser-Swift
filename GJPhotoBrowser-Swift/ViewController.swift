@@ -63,9 +63,10 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
             imageView.contentMode = UIViewContentMode.ScaleAspectFill
             imageView.clipsToBounds = true
             imageView.tag = i
-            imageView.userInteractionEnabled = true
             if let url = NSURL(string: self.urls[i]) {
-                imageView.sd_setImageWithURL(url)
+                imageView.sd_setImageWithURL(url, completed: { [weak imageView] (image: UIImage!, error: NSError!, cacheType: SDImageCacheType, url: NSURL!) -> Void in
+                    imageView?.userInteractionEnabled = error == nil
+                })
             }
             
             self.bgView.addSubview(imageView)
