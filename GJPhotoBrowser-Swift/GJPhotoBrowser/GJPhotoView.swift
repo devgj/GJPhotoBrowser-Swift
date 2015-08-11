@@ -38,6 +38,8 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
     
     func showImage(#animated: Bool) {
         loadingView.hidden = true
+        imageView.image = fromImageView?.image
+        setupImageViewFrame()
         if !animated {
            beginDownload()
         } else {
