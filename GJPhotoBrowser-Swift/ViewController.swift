@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Kingfisher
+import SDWebImage
 
 class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
@@ -65,7 +65,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
             imageView.tag = i
             imageView.userInteractionEnabled = true
             if let url = NSURL(string: self.urls[i]) {
-                imageView.kf_setImageWithURL(url)
+                imageView.sd_setImageWithURL(url)
             }
             
             self.bgView.addSubview(imageView)
