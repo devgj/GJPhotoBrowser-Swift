@@ -52,7 +52,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
     /**
     show with specify index, the index can't < 0
     */
-    func showWith(#currentIndex: Int) {
+    func showWith(currentIndex currentIndex: Int) {
         assert(currentIndex >= 0, "currentIndex不能小于0")
         self.currentIndex = currentIndex
         
@@ -190,7 +190,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         self.removeFromParentViewController()
     }
     
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         dismiss()
     }
 }

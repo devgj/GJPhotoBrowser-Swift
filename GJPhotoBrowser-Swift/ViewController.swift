@@ -16,7 +16,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
     @IBOutlet weak var bgView: UIView!
     private lazy var urls: [String] = {
-        let urls = [
+        return [
             "http://ww3.sinaimg.cn/wap360/006bUn4ljw1euwusbp673j30k00qoq7d.jpg",
             "http://ww1.sinaimg.cn/or360/a716fd45jw1eux8uc9k9gg208c08c1ky.jpg",
             "http://ww3.sinaimg.cn/wap360/67dd74e0gw1euxt4ok84xj20c84eanh4.jpg",
@@ -25,8 +25,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
             "http://ww2.sinaimg.cn/wap360/006bUn4ljw1euwus8h8ubj30go0fdabh.jpg",
             "http://ww2.sinaimg.cn/wap360/006bUn4ljw1euwus84thpj30dw0dw76q.jpg",
             "http://ww3.sinaimg.cn/wap360/006bUn4ljw1euwus794ioj30dw0980to.jpg",
-            "http://ww1.sinaimg.cn/wap360/006bUn4ljw1euwus6ooq6j30dw099aax.jpg",]
-        return urls
+            "http://ww1.sinaimg.cn/wap360/006bUn4ljw1euwus6ooq6j30dw099aax.jpg"]
     }()
     
     private lazy var imageViews = [UIImageView]()
@@ -86,7 +85,7 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
     
     func photoBrowser(photoBrowser: GJPhotoBrowser, viewForIndex index: Int) -> GJPhotoView {
         let photoView = photoBrowser.dequeueReusablePhotoView()
-        let srcImageView = imageViews[index]
+//        let srcImageView = imageViews[index]
         let urlStr = getBigImageUrlStrAtIndex(index)
         photoView.setImageWithURL(NSURL(string: urlStr)!, fromImageView: imageViews[index])
         return photoView
@@ -106,6 +105,10 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
     }
     
     func tapImage(sender: UIGestureRecognizer) {
+        let imageView = sender.view as! UIImageView
+        guard imageView.image != nil else {
+            return
+        }
         let photoBrowser = GJPhotoBrowser()
         photoBrowser.dataSource = self
         
@@ -114,6 +117,14 @@ class ViewController: UIViewController, GJPhotoBrowserDataSource {
             index = view.tag
         }
         photoBrowser.showWith(currentIndex: index)
+    }
+    
+    @IBAction func onClickClearCacheButton() {
+        SDImageCache.sharedImageCache().clearDisk()
+        SDImageCache.sharedImageCache().clearMemory()
+        for (index, imageView) in imageViews.enumerate() {
+            imageView.sd_setImageWithURL(NSURL(string: urls[index]))
+        }
     }
 }
 

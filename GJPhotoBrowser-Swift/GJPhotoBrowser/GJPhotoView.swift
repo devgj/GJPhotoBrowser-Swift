@@ -36,7 +36,7 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
         self.url = url
     }
     
-    func showImage(#animated: Bool) {
+    func showImage(animated animated: Bool) {
         loadingView.hidden = true
         imageView.image = fromImageView?.image
         setupImageViewFrame()
@@ -132,22 +132,16 @@ class GJPhotoView: UIScrollView, UIScrollViewDelegate {
             loadingView.progress = 0.1
         }
         
-        imageView.sd_setImageWithURL(url!, placeholderImage: fromImageView?.image, options: SDWebImageOptions.allZeros, progress: { [weak self] (receivedSize: Int, totalSize: Int) -> Void in
-                let progress = Double(receivedSize) / Double(totalSize)
-                self?.loadingView.progress = progress
-            }) { [weak self] (image: UIImage!, error: NSError!,  cacheType: SDImageCacheType, url: NSURL!) -> Void in
+        imageView.sd_setImageWithURL(url!, placeholderImage: fromImageView?.image, options: .LowPriority, progress: { [weak self] (receivedSize: Int, totalSize: Int) -> Void in
+            let progress = Double(receivedSize) / Double(totalSize)
+            self?.loadingView.progress = progress
+            }) { [weak self] (image: UIImage!, error: NSError!, cacheType: SDImageCacheType, url: NSURL!) -> Void in
                 self?.downloadCompletionWithImage(image)
                 self?.loadingView.hidden = true
         }
     }
     
     private func downloadCompletionWithImage(image: UIImage?) {
-        if let aImage = image {
-//            println("download success")
-        } else {
-//            println("download failure")
-        }
-        
         setupImageViewFrame()
     }
     

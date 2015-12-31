@@ -47,14 +47,14 @@ class GJProgressView: UIView {
         let endAngle = CGFloat(-M_PI_2 + progress * M_PI * 2);
         
         let blackPath = UIBezierPath(arcCenter: center, radius: radius, startAngle: startAngle, endAngle: CGFloat(M_PI * 2.0) + startAngle, clockwise: true)
-        CGContextSetLineWidth(ctx, 5.0);
+        CGContextSetLineWidth(ctx, 3.0);
         UIColor.blackColor().set()
         CGContextAddPath(ctx, blackPath.CGPath);
         CGContextStrokePath(ctx);
         
         let whitePath = UIBezierPath(arcCenter: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: true)
-        CGContextSetLineWidth(ctx, 5.0);
-        CGContextSetLineCap(ctx, kCGLineCapRound);
+        CGContextSetLineWidth(ctx, 3.0);
+        CGContextSetLineCap(ctx, .Round);
         UIColor.whiteColor().set()
         CGContextAddPath(ctx, whitePath.CGPath);
         CGContextStrokePath(ctx);
