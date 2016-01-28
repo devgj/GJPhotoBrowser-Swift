@@ -7,10 +7,7 @@
 - Xcode 7.2+
 
 ## Installation
-### CocoaPods
-```ruby
-pod 'GJPhotoBrowser-Swift', '~> 1.0'
-```
+暂时只支持手动拖进工程，后续会添加对pod的支持。运行Demo时请先执行`pod install`
 ## Usage
 
 ```swift
