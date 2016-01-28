@@ -22,11 +22,11 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
     private lazy var reusePhotoViewsPool = NSMutableSet()
     private lazy var visiblePhotoViewsPool = NSMutableSet()
     private var scrollView: UIScrollView!
+    private var indexLabel: UILabel!
     private var indexRange = (-1, -1)
     private var animatedFlag = true
     
     private let margin: CGFloat = 10
-    
     
     // MARK: - Public Method
     func dequeueReusablePhotoView() -> GJPhotoView {
@@ -73,6 +73,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
     // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupIndexLabel()
         setupScrollView()
     }
     
@@ -83,7 +84,7 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         frame.origin.x -= margin
         frame.size.width += 2 * margin
         scrollView.frame = frame
-        self.view.addSubview(scrollView)
+        self.view.insertSubview(scrollView, belowSubview: indexLabel)
         
         scrollView.backgroundColor = UIColor.clearColor()
         scrollView.contentSize = CGSizeMake(CGFloat(numberOfPhotos) * CGRectGetWidth(frame), 0)
@@ -93,8 +94,23 @@ class GJPhotoBrowser: UIViewController, UIScrollViewDelegate, GJPhotoViewDelegat
         scrollView.contentOffset = CGPointMake(CGFloat(self.currentIndex) * frame.size.width, 0);
     }
     
+    private func setupIndexLabel() {
+        indexLabel = UILabel()
+        let indexLabelW = self.view.bounds.size.width
+        let indexLabelH: CGFloat = 21
+        let indexLabelY = self.view.bounds.size.height - indexLabelH - 20
+        indexLabel.frame = CGRect(x: 0, y: indexLabelY, width: indexLabelW, height: indexLabelH)
+        indexLabel.textAlignment = .Center
+        indexLabel.textColor = UIColor.whiteColor()
+        indexLabel.font = UIFont.systemFontOfSize(16)
+        indexLabel.text = "\(currentIndex+1)/\(numberOfPhotos)"
+        self.view.addSubview(indexLabel)
+    }
+    
     // MARK: - UIScrollViewDelegate
     func scrollViewDidScroll(scrollView: UIScrollView) {
+        let index = Int(scrollView.contentOffset.x / scrollView.bounds.size.width + 0.5)
+        indexLabel.text = "\(index+1)/\(numberOfPhotos)"
         showPhotoViews()
     }
     
